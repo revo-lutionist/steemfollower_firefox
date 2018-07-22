@@ -1,5 +1,6 @@
+//listen for click on extension button/icon
 chrome.pageAction.onClicked.addListener((tab) => {
-    //get username after '@'
+    //get username from URL after '@'
     var user = tab.url.split("@")[1];
 
     //store user for use on steemFollower.html/js

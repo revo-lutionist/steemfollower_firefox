@@ -1,7 +1,7 @@
+//listen for page finished loading
 document.addEventListener("DOMContentLoaded", () => {
     //show loader gif
     document.getElementById("overlay").style.display = "block";
-
     start();
 });
 
@@ -18,12 +18,13 @@ async function start() {
     var totalVests = "";
     var user = "";
 
+    //retrieve username from storage that was set in background.js
     window.localStorage.getItem("user") ? user = window.localStorage.getItem("user") : user = "revo";
 
+    //retrieve followers from the blockchain at 1000(max) chunks per time.
     do {
         await steem.api.getFollowersAsync(user, start, 'blog', 1000)
         .then((result) => {
-            //console.log(result);
             count = result.length;
 
             for (var member of result) {
@@ -34,23 +35,21 @@ async function start() {
 
     } while (count === 1000);
 
-    console.log("followers:",arrFollowers.length);  
-
+    //get the accounts of all the user's followers from the blockchain
     steem.api.getAccountsAsync(arrFollowers)
     .then(async (result) => {
-        //console.log(result)
         await steem.api.getDynamicGlobalPropertiesAsync()
         .then((res) => {
-            //console.log("globaldynamprops:",res)
+            //extract the actual number from the string
             steemVests = res.total_vesting_fund_steem.match(/\d+\.\d+/);
             totalVests = res.total_vesting_shares.match(/\d+\.\d+/);
-            console.log("steemVests:",steemVests)
-            console.log("totalVests:",totalVests)
         });
 
+        //iterate through each follower's blockchain account
         for (var obj of result) {
             var rep = Math.floor((Math.log10(parseInt(obj.reputation))-9)*9 + 25);
             
+            //countX holds the reputation distribution data
             if (rep < 25) {
                 count4++;
             } else if (rep >= 25 && rep <= 30) {
@@ -65,10 +64,11 @@ async function start() {
                 count4++
             }
          
-            //var vests = parseInt(obj.vesting_shares.match(/\d+\.\d+/)) + parseInt(obj.received_vesting_shares.match(/\d+\.\d+/));
+            //calculate SP from vests
             var vests = parseInt(/\d+\.\d+/.exec(obj.vesting_shares)) + parseInt(/\d+\.\d+/.exec(obj.received_vesting_shares));
             var SP = Math.floor(parseInt(steemVests[0]) * (parseInt(vests)/parseInt(totalVests[0])));
 
+            //countX holds the SP distribution data
             if (SP < 100) {
                 count9++;
             } else if (SP >= 100 && SP <= 500) {
@@ -81,6 +81,7 @@ async function start() {
                 count13++;
             }
 
+            //determine time since last post by follower
             var dateComment = new Date(obj.last_post + "Z");    //UTC
             var datePost = new Date(obj.last_root_post + "Z");  //UTC
             var now = new Date();
@@ -90,21 +91,22 @@ async function start() {
 
             mlsElapsed < mlsElapsed2 ? true : mlsElapsed = mlsElapsed2; //use most recent
 
-            if (mlsElapsed <= 60480000) {   // 1 week
+            if (mlsElapsed <= 60480000) {                                               // 1 week
                 arrRecentPosts.push({ name: obj.name, reputation: rep, sp: SP });
-                //count2++;
-            } else if (mlsElapsed > 60480000 && mlsElapsed <= 2678400000) {  // 1 month
+            } else if (mlsElapsed > 60480000 && mlsElapsed <= 2678400000) {             // 1 month
                 arrLessRecentPosts.push({ name: obj.name, reputation: rep, sp: SP });
-                //count3++;
             }
         }
 
+        //concatenate the two most recent categories into one for further statistics
         arrFollowerObjects = arrRecentPosts.concat(arrLessRecentPosts);
-        //now need to run this through same code as above to get SP and Rep distributions for these recent posters
+
+        //now need to run this through same code as above to get SP and Rep distributions for these recent posting followers
         for (var objFollower of arrFollowerObjects) {
             var rep = objFollower.reputation;
             var SP = objFollower.sp;
 
+            //countX holds the reputation distribution data
             if (rep < 25) {
                 count14++;
             } else if (rep >= 25 && rep <= 30) {
@@ -119,6 +121,7 @@ async function start() {
                 count14++
             }
 
+            //countX holds the SP distribution data
             if (SP < 100) {
                 count19++;
             } else if (SP >= 100 && SP <= 500) {
@@ -135,10 +138,11 @@ async function start() {
         intRecent = arrRecentPosts.length;
         intLessRecent = arrLessRecentPosts.length;
         intTotal = arrFollowers.length; 
-        console.log("intTotal:", intTotal)
 
+        //hide loader gif
         document.getElementById("overlay").style.display = "none";
 
+        //data for first chart - follower activity
         document.getElementById("1").style.height = 100*intRecent/intTotal + "%";
         document.getElementById("1").title = intRecent + " (" + (100*intRecent/intTotal).toFixed() + "%)";
         document.getElementById("2").style.height = 100*intLessRecent/intTotal + "%";
@@ -146,6 +150,7 @@ async function start() {
         document.getElementById("3").style.height = 100*(intTotal-intRecent-intLessRecent)/intTotal + "%";
         document.getElementById("3").title = (intTotal-intRecent-intLessRecent) + " (" + 100*((intTotal-intRecent-intLessRecent)/intTotal).toFixed() + "%)";
 
+        //data for second chart - follower reputation distribution
         document.getElementById("4").style.height = 100*count4/intTotal + "%";
         document.getElementById("4").title = count4 + " (" + (100*count4/intTotal).toFixed() + "%)";
         document.getElementById("5").style.height = 100*count5/intTotal + "%";
@@ -157,6 +162,7 @@ async function start() {
         document.getElementById("8").style.height = 100*count8/intTotal + "%";
         document.getElementById("8").title = count8 + " (" + (100*count8/intTotal).toFixed() + "%)";
 
+        //data for third chart - follower SP distribution
         document.getElementById("9").style.height = 100*count9/intTotal + "%";
         document.getElementById("9").title = count9 + " (" + (100*count9/intTotal).toFixed() + "%)";
         document.getElementById("10").style.height = 100*count10/intTotal + "%";
@@ -168,6 +174,7 @@ async function start() {
         document.getElementById("13").style.height = 100*count13/intTotal + "%";
         document.getElementById("13").title = count13 + " (" + (100*count13/intTotal).toFixed() + "%)";
 
+        //data for fourth chart - active followers reputation distribution
         document.getElementById("14").style.height = 100*count14/arrFollowerObjects.length + "%";
         document.getElementById("14").title = count14 + " (" + (100*count14/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("15").style.height = 100*count15/arrFollowerObjects.length + "%";
@@ -179,6 +186,7 @@ async function start() {
         document.getElementById("18").style.height = 100*count18/arrFollowerObjects.length + "%";
         document.getElementById("18").title = count18 + " (" + (100*count18/arrFollowerObjects.length).toFixed() + "%)";
 
+        //data for fifth chart - active followers SP distribution
         document.getElementById("19").style.height = 100*count19/arrFollowerObjects.length + "%";
         document.getElementById("19").title = count19 + " (" + (100*count19/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("20").style.height = 100*count20/arrFollowerObjects.length + "%";
