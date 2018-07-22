@@ -19,7 +19,7 @@ async function start() {
     var user = "";
 
     //retrieve username from storage that was set in background.js
-    window.localStorage.getItem("user") ? user = window.localStorage.getItem("user") : user = "revo";
+    user = window.localStorage.getItem("user");
 
     //retrieve followers from the blockchain at 1000(max) chunks per time.
     do {
