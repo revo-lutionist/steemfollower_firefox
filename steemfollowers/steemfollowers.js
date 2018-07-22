@@ -1,3 +1,10 @@
+document.addEventListener("DOMContentLoaded", () => {
+    //show loader gif
+    document.getElementById("overlay").style.display = "block";
+
+    start();
+});
+
 async function start() {
     var count = 0, count2 = 0, count3 = 0, count4 = 0, count5 = 0, count6 = 0, count7 = 0, count8 = 0, count9 = 0,
         count10 = 0, count11 = 0, count12 = 0, count13 = 0, count14 = 0, count15 = 0, count16 = 0, count17 = 0, 
@@ -9,11 +16,12 @@ async function start() {
     var arrLessRecentPosts = [];
     var steemVests = "";
     var totalVests = "";
+    var user = "";
 
-    document.getElementById("overlay").style.display = "block";
+    window.localStorage.getItem("user") ? user = window.localStorage.getItem("user") : user = "revo";
 
     do {
-        await steem.api.getFollowersAsync("revo", start, 'blog', 1000)
+        await steem.api.getFollowersAsync(user, start, 'blog', 1000)
         .then((result) => {
             //console.log(result);
             count = result.length;
@@ -53,6 +61,8 @@ async function start() {
                 count7++;
             } else if (rep > 60) {
                 count8++;
+            } else {    //there is a value of -infinity
+                count4++
             }
          
             //var vests = parseInt(obj.vesting_shares.match(/\d+\.\d+/)) + parseInt(obj.received_vesting_shares.match(/\d+\.\d+/));
@@ -105,6 +115,8 @@ async function start() {
                 count17++;
             } else if (rep > 60) {
                 count18++;
+            } else {    //there is a value of -infinity
+                count14++
             }
 
             if (SP < 100) {
@@ -123,58 +135,59 @@ async function start() {
         intRecent = arrRecentPosts.length;
         intLessRecent = arrLessRecentPosts.length;
         intTotal = arrFollowers.length; 
+        console.log("intTotal:", intTotal)
 
         document.getElementById("overlay").style.display = "none";
 
         document.getElementById("1").style.height = 100*intRecent/intTotal + "%";
-        document.getElementById("1").title = (100*intRecent/intTotal).toFixed(1) + "%";
+        document.getElementById("1").title = intRecent + " (" + (100*intRecent/intTotal).toFixed() + "%)";
         document.getElementById("2").style.height = 100*intLessRecent/intTotal + "%";
-        document.getElementById("2").title = (100*intLessRecent/intTotal).toFixed(1) + "%"
+        document.getElementById("2").title = intLessRecent + " (" + (100*intLessRecent/intTotal).toFixed() + "%)";
         document.getElementById("3").style.height = 100*(intTotal-intRecent-intLessRecent)/intTotal + "%";
-        document.getElementById("3").title = 100*((intTotal-intRecent-intLessRecent)/intTotal).toFixed(1) + "%";
+        document.getElementById("3").title = (intTotal-intRecent-intLessRecent) + " (" + 100*((intTotal-intRecent-intLessRecent)/intTotal).toFixed() + "%)";
 
         document.getElementById("4").style.height = 100*count4/intTotal + "%";
-        document.getElementById("4").title = (100*count4/intTotal).toFixed(1) + "%";
+        document.getElementById("4").title = count4 + " (" + (100*count4/intTotal).toFixed() + "%)";
         document.getElementById("5").style.height = 100*count5/intTotal + "%";
-        document.getElementById("5").title = (100*count5/intTotal).toFixed(1) + "%";
+        document.getElementById("5").title = count5 + " (" + (100*count5/intTotal).toFixed() + "%)";
         document.getElementById("6").style.height = 100*count6/intTotal + "%";
-        document.getElementById("6").title = (100*count6/intTotal).toFixed(1) + "%";
+        document.getElementById("6").title = count6 + " (" + (100*count6/intTotal).toFixed() + "%)";
         document.getElementById("7").style.height = 100*count7/intTotal + "%";
-        document.getElementById("7").title = (100*count7/intTotal).toFixed(1) + "%";
+        document.getElementById("7").title = count7 + " (" + (100*count7/intTotal).toFixed() + "%)";
         document.getElementById("8").style.height = 100*count8/intTotal + "%";
-        document.getElementById("8").title = (100*count8/intTotal).toFixed(1) + "%";
+        document.getElementById("8").title = count8 + " (" + (100*count8/intTotal).toFixed() + "%)";
 
         document.getElementById("9").style.height = 100*count9/intTotal + "%";
-        document.getElementById("9").title = (100*count9/intTotal).toFixed(1) + "%";
+        document.getElementById("9").title = count9 + " (" + (100*count9/intTotal).toFixed() + "%)";
         document.getElementById("10").style.height = 100*count10/intTotal + "%";
-        document.getElementById("10").title = (100*count10/intTotal).toFixed(1) + "%";
+        document.getElementById("10").title = count10 + " (" + (100*count10/intTotal).toFixed() + "%)";
         document.getElementById("11").style.height = 100*count11/intTotal + "%";
-        document.getElementById("11").title = (100*count11/intTotal).toFixed(1) + "%";
+        document.getElementById("11").title = count11 + " (" + (100*count11/intTotal).toFixed() + "%)";
         document.getElementById("12").style.height = 100*count12/intTotal + "%";
-        document.getElementById("12").title = (100*count12/intTotal).toFixed(1) + "%";
+        document.getElementById("12").title = count12 + " (" + (100*count12/intTotal).toFixed() + "%)";
         document.getElementById("13").style.height = 100*count13/intTotal + "%";
-        document.getElementById("13").title = (100*count13/intTotal).toFixed(1) + "%";
+        document.getElementById("13").title = count13 + " (" + (100*count13/intTotal).toFixed() + "%)";
 
         document.getElementById("14").style.height = 100*count14/arrFollowerObjects.length + "%";
-        document.getElementById("14").title = (100*count14/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("14").title = count14 + " (" + (100*count14/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("15").style.height = 100*count15/arrFollowerObjects.length + "%";
-        document.getElementById("15").title = (100*count15/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("15").title = count15 + " (" + (100*count15/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("16").style.height = 100*count16/arrFollowerObjects.length + "%";
-        document.getElementById("16").title = (100*count16/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("16").title = count16 + " (" + (100*count16/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("17").style.height = 100*count17/arrFollowerObjects.length + "%";
-        document.getElementById("17").title = (100*count17/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("17").title = count17 + " (" + (100*count17/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("18").style.height = 100*count18/arrFollowerObjects.length + "%";
-        document.getElementById("18").title = (100*count18/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("18").title = count18 + " (" + (100*count18/arrFollowerObjects.length).toFixed() + "%)";
 
         document.getElementById("19").style.height = 100*count19/arrFollowerObjects.length + "%";
-        document.getElementById("19").title = (100*count19/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("19").title = count19 + " (" + (100*count19/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("20").style.height = 100*count20/arrFollowerObjects.length + "%";
-        document.getElementById("20").title = (100*count20/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("20").title = count20 + " (" + (100*count20/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("21").style.height = 100*count21/arrFollowerObjects.length + "%";
-        document.getElementById("21").title = (100*count21/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("21").title = count21 + " (" + (100*count21/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("22").style.height = 100*count22/arrFollowerObjects.length + "%";
-        document.getElementById("22").title = (100*count22/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("22").title = count22 + " (" + (100*count22/arrFollowerObjects.length).toFixed() + "%)";
         document.getElementById("23").style.height = 100*count23/arrFollowerObjects.length + "%";
-        document.getElementById("23").title = (100*count23/arrFollowerObjects.length).toFixed(1) + "%";
+        document.getElementById("23").title = count23 + " (" + (100*count23/arrFollowerObjects.length).toFixed() + "%)";
     });
 }
