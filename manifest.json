@@ -5,7 +5,8 @@
     "version": "0.2.0",
     "description": "Stats About Your Followers",
     "permissions": [
-        "tabs"
+        "tabs",
+        "storage"
     ],
     "background": {
         "scripts": ["background.js"]
